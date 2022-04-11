@@ -20,35 +20,78 @@ typedef struct mandelbrot_painting
 }mandelbrot_painting;
 
 
-void calculate_point()
-{
+// unsigned char calculate_color(double x, double y)
+// {
 
-}
+// }
 
 void printing_madnelbrot(sf::RenderWindow* window)
 {
-    sf::Texture mandelbrot_layer;
-    mandelbrot_layer.create(WIDTH, HEIGHT);
-    sf::Sprite sprite(mandelbrot_layer);
 
     mandelbrot_painting mandelbrot_struct = {};
+    sf::Texture mandelbrot_layer;
+
+    mandelbrot_layer.create(WIDTH, HEIGHT);
+    mandelbrot_layer.update(mandelbrot_struct.pixels, WIDTH, HEIGHT, 0, 0);
+
+    sf::Sprite sprite;
+    sprite.setTexture(mandelbrot_layer);
+
+
     double dx = 1/900.f, dy = 1/600.f, scale = 1.f;
-    const int   nMax  = 256;
+    double    rmax  = 100.f;
+    const int nMax  = 256;
+    
 
     //key rofles
 
     for (int yi = 0; yi < HEIGHT; yi++)
     {
-        double x0 = ((  -  450.f)*dx + mandelbrot_struct.x_center) * scale;
-        double y0 = ((yi - 300.f)*dy + mandelbrot_struct.y_center) * scale;
+        double x0 = ((           -  450.f)*dx + mandelbrot_struct.x_center) * scale,
+               y0 = (((double)yi -  300.f)*dy + mandelbrot_struct.y_center) * scale;
 
         for (int xi = 0; xi < WIDTH; xi++, x0 += dx)
         {
-            
+            double current_x = x0,
+                   current_y = y0;
+
+            for (int n = 0; n < nMax; n++)
+            {
+                double sqr_x = current_x * current_x, 
+                       sqr_y = current_y * current_y, 
+                       xy    = current_x * current_y;
+                
+                double sqr_r = sqr_x + sqr_y;
+
+                if (sqr_r >= rmax)
+                {
+                    current_x = 0;
+                    current_y = 0;
+                    break;
+                }
+
+                current_x = sqr_x - sqr_y + x0;
+                current_y =  xy   +  xy   + y0;
+            }
+
+            if (current_x == 0 && current_y == 0)
+            {
+                mandelbrot_struct.pixels[xi + yi* WIDTH + 0] = 0;
+                mandelbrot_struct.pixels[xi + yi* WIDTH + 1] = 0;
+                mandelbrot_struct.pixels[xi + yi* WIDTH + 2] = 0;
+                mandelbrot_struct.pixels[xi + yi* WIDTH + 3] = 255;
+            }
+            else
+            {
+                mandelbrot_struct.pixels[xi + yi* WIDTH + 0] = 255;
+                mandelbrot_struct.pixels[xi + yi* WIDTH + 1] = 255;
+                mandelbrot_struct.pixels[xi + yi* WIDTH + 2] = 255;
+                mandelbrot_struct.pixels[xi + yi* WIDTH + 3] = 255;
+            }
         }
     }
 
-    mandelbrot_layer.update(mandelbrot_struct.pixels);
+    mandelbrot_layer.update(mandelbrot_struct.pixels, WIDTH, HEIGHT, 0, 0);
 
     (*window).draw(sprite);
 }

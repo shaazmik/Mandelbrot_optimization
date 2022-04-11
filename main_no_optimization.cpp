@@ -9,9 +9,43 @@ static const int Fps_buf_size = 1024;
 static float Fps = 0;
 static int character_size = 15;
 
-void calculate()
+
+typedef struct mandelbrot_painting
 {
+    double x_center = 0.f;
+    double y_center = 0.f;
+    double scale    = 1.f;
     
+    sf::Uint8* pixels = new sf::Uint8[WIDTH*HEIGHT*4];
+
+}mandelbrot_painting;
+
+
+void calculate_point()
+{
+
+}
+
+void printing_madnelbrot(sf::RenderWindow* window)
+{
+    sf::Texture mandelbrot_layer;
+    mandelbrot_layer.create(WIDTH, HEIGHT);
+    sf::Sprite sprite(mandelbrot_layer);
+    int red = 244, green = 111, blue = 15, attr = 200, add = 0;
+
+    mandelbrot_painting mandelbrot_struct = {};
+
+    for(int i = 0; i < WIDTH * HEIGHT * 4; i += 4)
+    {
+        mandelbrot_struct.pixels[i] = red;
+        mandelbrot_struct.pixels[i + 1] = green;
+        mandelbrot_struct.pixels[i + 2] = blue;
+        mandelbrot_struct.pixels[i + 3] = attr;
+    }    
+
+    mandelbrot_layer.update(mandelbrot_struct.pixels);
+
+    (*window).draw(sprite);
 }
 
 
@@ -60,8 +94,7 @@ int main()
         // clear the window with black color
         window.clear(sf::Color::Black);
 
-        calculate();
-
+        printing_madnelbrot(&window);
         print_fps(&clock, &previousTime, &window, &font);
 
         window.display();

@@ -14,7 +14,6 @@ typedef struct mandelbrot_painting
 {
     double x_center = 0.f;
     double y_center = 0.f;
-    double scale    = 1.f;
     
     sf::Uint8* pixels = new sf::Uint8[WIDTH*HEIGHT*4];
 
@@ -31,17 +30,23 @@ void printing_madnelbrot(sf::RenderWindow* window)
     sf::Texture mandelbrot_layer;
     mandelbrot_layer.create(WIDTH, HEIGHT);
     sf::Sprite sprite(mandelbrot_layer);
-    int red = 244, green = 111, blue = 15, attr = 200, add = 0;
 
     mandelbrot_painting mandelbrot_struct = {};
+    double dx = 1/900.f, dy = 1/600.f, scale = 1.f;
+    const int   nMax  = 256;
 
-    for(int i = 0; i < WIDTH * HEIGHT * 4; i += 4)
+    //key rofles
+
+    for (int yi = 0; yi < HEIGHT; yi++)
     {
-        mandelbrot_struct.pixels[i] = red;
-        mandelbrot_struct.pixels[i + 1] = green;
-        mandelbrot_struct.pixels[i + 2] = blue;
-        mandelbrot_struct.pixels[i + 3] = attr;
-    }    
+        double x0 = ((  -  450.f)*dx + mandelbrot_struct.x_center) * scale;
+        double y0 = ((yi - 300.f)*dy + mandelbrot_struct.y_center) * scale;
+
+        for (int xi = 0; xi < WIDTH; xi++, x0 += dx)
+        {
+            
+        }
+    }
 
     mandelbrot_layer.update(mandelbrot_struct.pixels);
 

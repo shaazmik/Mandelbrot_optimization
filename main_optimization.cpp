@@ -49,6 +49,7 @@ void printing_madnelbrot(sf::RenderWindow* window, mandelbrot_painting* mandelbr
     const __m256i   _nMax     = _mm256_set1_epi32(nMax);
     const __m256    _scale_dx = _mm256_set1_ps(scale_dx);
     const __m256    _iter     = _mm256_set_ps(7, 6, 5, 4, 3, 2, 1, 0);
+    const __m256    _255      = _mm256_set1_ps(255.f);
 
 
     sf::Uint8* pixels = mandelbrot_struct->pixels;
@@ -81,25 +82,38 @@ void printing_madnelbrot(sf::RenderWindow* window, mandelbrot_painting* mandelbr
 
                 __m256 _cmp   = _mm256_cmp_ps(_sqr_r, _rmax, _CMP_LE_OQ);
                 int    mask   = _mm256_movemask_ps(_cmp);
+                if (!mask) break;
 
-                if (!mask)
-                {
+                _n = _mm256_sub_epi32(_n, _mm256_castps_si256(_cmp));
 
-                }
-
-                current_x = sqr_x - sqr_y + x0;
-                current_y =  xy   +  xy   + y0;
+                _cur_x = _mm256_add_ps(_mm256_sub_ps(_sqr_x, _sqr_y), _x0);
+                _cur_y = _mm256_add_ps(_mm256_add_ps(_xy, _xy), _y0);                
             }
 
-            float color_base = sqrtf(sqrtf(float(n)/float(nMax))) * 255.f;
-            unsigned char intensive = (unsigned char) color_base;
+            __m256 _color_base = _mm256_mul_ps(_mm256_sqrt_ps(_mm256_div_ps(_mm256_cvtepi32_ps(_n), _mm256_cvtepi32_ps(_nMax) ) ), _255);
+            for (int i = 0; i < 8; i++)
+            {
+                int*   p_n          = (int*)   &_n;
+                float* p_color_base = (float*) &_color_base;
+                
+                unsigned char intensive = p_color_base[i];
+                int offset_Y = WIDTH * 4 * yi;
 
-            int offset_Y = WIDTH * 4 * yi;
-
-            pixels[xi + offset_Y + 0] = (unsigned char) intensive / 1.6;
-            pixels[xi + offset_Y + 1] = (unsigned char) intensive * 2.1;
-            pixels[xi + offset_Y + 2] = (unsigned char) intensive * 4.9;
-            pixels[xi + offset_Y + 3] = intensive;
+                if (p_n[i] < nMax)
+                {
+                    pixels[xi + offset_Y + 0 + i * 4] = (unsigned char) intensive / 1.6;
+                    pixels[xi + offset_Y + 1 + i * 4] = (unsigned char) intensive * 2.1;
+                    pixels[xi + offset_Y + 2 + i * 4] = (unsigned char) intensive * 4.9;
+                    pixels[xi + offset_Y + 3 + i * 4] = intensive;
+                }
+                else
+                {
+                    pixels[xi + offset_Y + 0 + i * 4] = 0;
+                    pixels[xi + offset_Y + 1 + i * 4] = 0;
+                    pixels[xi + offset_Y + 2 + i * 4] = 0;
+                    pixels[xi + offset_Y + 3 + i * 4] = 0;
+                }
+            }
         }
     }
 

@@ -1,7 +1,7 @@
 # Mandelbrot_optimization
-
+## Program uses AVX instruction to optimise
 ____
 
-## Program uses AVX instruction to optimise
+
 
 ____

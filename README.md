@@ -2,6 +2,6 @@
 
 ____
 
-##Program uses AVX instruction to optimise
+## Program uses AVX instruction to optimise
 
 ____

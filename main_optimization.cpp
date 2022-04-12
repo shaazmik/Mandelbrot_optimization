@@ -1,7 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <math.h>
-#include <emmintrin.h>
+#include <immintrin.h>
 
 
 static const int WIDTH = 900, HEIGHT = 600;
@@ -33,43 +33,58 @@ void printing_madnelbrot(sf::RenderWindow* window, mandelbrot_painting* mandelbr
     sf::Sprite sprite;
     sprite.setTexture(mandelbrot_layer);
 
-    double    rmax  = 100.f;
     const int nMax  = 256;
+    
+    double x_center = mandelbrot_struct->x_center,
+           y_center = mandelbrot_struct->y_center,
+           scale    = mandelbrot_struct->scale,
+           dx       = mandelbrot_struct->dx,
+           dy       = mandelbrot_struct->dy;
 
-    double scale    = mandelbrot_struct->scale, 
-           dx       = mandelbrot_struct->dx, 
-           dy       = mandelbrot_struct->dy,
-           x_center = mandelbrot_struct->x_center,
-           y_center = mandelbrot_struct->y_center;
+
+    float scale_dx  = scale * dx;
+
+
+    const __m256    _rmax     = _mm256_set1_ps(100.f);
+    const __m256i   _nMax     = _mm256_set1_epi32(nMax);
+    const __m256    _scale_dx = _mm256_set1_ps(scale_dx);
+    const __m256    _iter     = _mm256_set_ps(7, 6, 5, 4, 3, 2, 1, 0);
+
 
     sf::Uint8* pixels = mandelbrot_struct->pixels;
 
 
     for (int yi = 0; yi < HEIGHT; yi++)
     {
-        double x0 = ((           -  WIDTH/2 ) * scale + x_center) * dx,
-               y0 = (((double)yi -  HEIGHT/2) * scale + y_center) * dy;
+        float  x0 = (            -  WIDTH/2 ) * scale_dx + x_center  * dx,
+               y0 = (((double)yi -  HEIGHT/2) * scale    + y_center) * dy;
 
-        for (int xi = 0; xi < 4 * WIDTH; xi = xi + 4, x0 += dx * scale)
+        float x0_dif = 8 * scale_dx;
+
+        for (int xi = 0; xi < 4 * WIDTH; xi+= 32, x0 += x0_dif)
         {
-            double current_x = x0,
-                   current_y = y0;
+            __m256 _x0 = _mm256_add_ps(_mm256_set1_ps(x0), _mm256_mul_ps(_iter, _scale_dx)),
+                   _y0 = _mm256_set1_ps(y0);
 
-            int n = 0;
+            __m256i _n = _mm256_setzero_si256();
 
-            for (; n < nMax; n++)
+            __m256 _cur_x = _x0,
+                   _cur_y = _y0;
+
+            for (int n = 0; n < nMax; n++)
             {
-                double sqr_x = current_x * current_x, 
-                       sqr_y = current_y * current_y, 
-                       xy    = current_x * current_y;
+                __m256 _sqr_x = _mm256_mul_ps(_cur_x, _cur_x), 
+                       _sqr_y = _mm256_mul_ps(_cur_y, _cur_y), 
+                       _xy    = _mm256_mul_ps(_cur_x, _cur_y);
                 
-                double sqr_r = sqr_x + sqr_y;
+                __m256 _sqr_r = _mm256_add_ps(_sqr_x, _sqr_y);
 
-                if (sqr_r >= rmax)
+                __m256 _cmp   = _mm256_cmp_ps(_sqr_r, _rmax, _CMP_LE_OQ);
+                int    mask   = _mm256_movemask_ps(_cmp);
+
+                if (!mask)
                 {
-                    current_x = 0;
-                    current_y = 0;
-                    break;
+
                 }
 
                 current_x = sqr_x - sqr_y + x0;

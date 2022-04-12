@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <math.h>
+#include <emmintrin.h>
 
 
 static const int WIDTH = 900, HEIGHT = 600;

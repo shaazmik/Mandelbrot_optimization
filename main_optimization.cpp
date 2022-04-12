@@ -7,6 +7,7 @@
 static const int WIDTH = 900, HEIGHT = 600;
 static const int Fps_buf_size = 1024;
 static float Fps = 0;
+static const float center_shift = 10.f, scale_shift = 0.1f;
 static int character_size = 15;
 
 
@@ -169,27 +170,27 @@ int main()
             {
                 if (event.key.code == sf::Keyboard::A)
                 {
-                    mandelbrot_struct.x_center -= mandelbrot_struct.scale* 10.f;
+                    mandelbrot_struct.x_center -= mandelbrot_struct.scale * center_shift;
                 }
                 else if (event.key.code == sf::Keyboard::D)
                 {
-                    mandelbrot_struct.x_center += mandelbrot_struct.scale* 10.f;
+                    mandelbrot_struct.x_center += mandelbrot_struct.scale * center_shift;
                 }
                 else if (event.key.code == sf::Keyboard::W)
                 {
-                    mandelbrot_struct.y_center -= mandelbrot_struct.scale* 10.f;
+                    mandelbrot_struct.y_center -= mandelbrot_struct.scale * center_shift;
                 }
                 else if (event.key.code == sf::Keyboard::S)
                 {
-                    mandelbrot_struct.y_center += mandelbrot_struct.scale* 10.f;
+                    mandelbrot_struct.y_center += mandelbrot_struct.scale * center_shift;
                 }
                 else if (event.key.code == sf::Keyboard::X)
                 {
-                    mandelbrot_struct.scale -= mandelbrot_struct.scale * 0.1f;
+                    mandelbrot_struct.scale -= mandelbrot_struct.scale * scale_shift;
                 }
                 else if (event.key.code == sf::Keyboard::Z)
                 {
-                    mandelbrot_struct.scale += mandelbrot_struct.scale * 0.1f;
+                    mandelbrot_struct.scale += mandelbrot_struct.scale * scale_shift;
                 }
             }
         }

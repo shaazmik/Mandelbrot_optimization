@@ -1,4 +1,7 @@
 # Mandelbrot_optimization
+
+![Image alt](https://github.com/shaazmik/Mandelbrot_optimization/blob/main/Mandelbrot.PNG)
+
 ## Program uses AVX instruction to optimise
 ____
 

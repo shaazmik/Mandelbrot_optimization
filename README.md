@@ -19,3 +19,13 @@ compile without instructions:
   
 > g++ -L"library path"\SFML-2.5.1\lib .\main_no_optimization.o -o name_file.exe -lmingw32 -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lsfml-main -mwindows  
 ____
+
+
+### Results:
+
+| **COMPILED**        | ___FPS___           |
+|---------------------|---------------------|
+|**WITH OPTIMIZATION**| **58**              |
+|___ONLY ```-O2```___ |  **6**              |
+
+___TOTAL INCREASE: 9,6 TIMES ___
